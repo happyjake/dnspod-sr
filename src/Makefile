@@ -31,3 +31,7 @@ init.o:author.o init.c
 .PHONY : clean
 clean:
 	rm -f $(OBJS) dnspod-sr
+
+install:
+	rm /usr/local/bin/dnspod-sr
+	cp ./dnspod-sr /usr/local/bin/

@@ -160,7 +160,7 @@ read_records_from_file(const uchar * fn, struct htable *ds,
 int
 read_root(struct htable *ds, struct rbtree *rbt)
 {
-    return read_records_from_file("../root.z", ds, rbt);
+    return read_records_from_file("/root/etc/dnspod/root.z", ds, rbt);
 }
 
 
@@ -307,32 +307,44 @@ int
 write_loginfo_into_file(int fd, const uchar * domain, int type,
                         struct sockaddr_in *addr)
 {
-    int len = 0;
-    char buffer[600] = { 0 };
-    char *itor;
-    uchar tp = type % 256;
-    itor = buffer;
-    if (fd <= 0)
-        return -1;
-    if (domain != NULL) {
-        len = fill_domain_to_len_label(domain, itor);
-        itor += len;
-        memcpy(itor, &tp, sizeof(uchar));
-        itor += sizeof(uchar);
-        if (addr != NULL) {
-            //127.0.0.1 would be 0x 7f 00 00 01
-            memcpy(itor, &(addr->sin_addr.s_addr), sizeof(ulong));
-            itor += sizeof(struct in_addr);
-        }
-        write(fd, buffer, itor - buffer);
-    } else                      //write time stamp
-    {
-        buffer[0] = '1';        // timestamp
-        sprintf(buffer + 1, "%lu", global_now);
-        memcpy(buffer + strlen(buffer), "#", 1);        //no 0 end
-        write(fd, buffer, strlen(buffer));
-    }
-    write(fd, "\n", 2);
+    char from[32] = {0};
+    printf("%d.%d.%d.%d => ",
+      (int)( addr->sin_addr.s_addr&0xFF),
+      (int)((addr->sin_addr.s_addr&0xFF00)>>8),
+      (int)((addr->sin_addr.s_addr&0xFF0000)>>16),
+      (int)((addr->sin_addr.s_addr&0xFF000000)>>24));
+     
+    char domstr[256] = {0};
+    int len = fill_domain_to_len_label(domain, domstr);
+    printf(domstr);
+    printf("\n");
+    
+//    int len = 0;
+//    char buffer[600] = { 0 };
+//    char *itor;
+//    uchar tp = type % 256;
+//    itor = buffer;
+//    if (fd <= 0)
+//        return -1;
+//    if (domain != NULL) {
+//        len = fill_domain_to_len_label(domain, itor);
+//        itor += len;
+//        memcpy(itor, &tp, sizeof(uchar));
+//        itor += sizeof(uchar);
+//        if (addr != NULL) {
+//            //127.0.0.1 would be 0x 7f 00 00 01
+//            memcpy(itor, &(addr->sin_addr.s_addr), sizeof(ulong));
+//            itor += sizeof(struct in_addr);
+//        }
+//        write(fd, buffer, itor - buffer);
+//    } else                      //write time stamp
+//    {
+//        buffer[0] = '1';        // timestamp
+//        sprintf(buffer + 1, "%lu", global_now);
+//        memcpy(buffer + strlen(buffer), "#", 1);        //no 0 end
+//        write(fd, buffer, strlen(buffer));
+//    }
+//    write(fd, "\n", 2);
     return 0;
 }
 
@@ -345,6 +357,7 @@ write_loginfo_into_file(int fd, const uchar * domain, int type,
 int
 create_new_log(uchar * prefix, int idx, int type)
 {
+    return dup(0);
     static char pf[50] = { 0 };
     char filename[80] = { 0 };
     char final[130] = { 0 };
@@ -383,12 +396,18 @@ int
 write_log(int *fd, time_t * lastlog, int idx, const uchar * domain,
           int type, struct sockaddr_in *addr)
 {
-    int lfd = *fd;
-    if (((global_now % LOG_INTERVAL) == 0) && (global_now > (*lastlog))) {
-        close(lfd);
-        lfd = create_new_log(NULL, idx, TYPE_FETCHER);
-        *fd = lfd;
-    }
-    write_loginfo_into_file(lfd, domain, type, addr);
+//    int lfd = *fd;
+//    if (((global_now % LOG_INTERVAL) == 0) && (global_now > (*lastlog))) {
+//        close(lfd);
+//        lfd = create_new_log(NULL, idx, TYPE_FETCHER);
+//        *fd = lfd;
+//    }
+//    write_loginfo_into_file(lfd, domain, type, addr);
+
+//    static int save_in = 0;
+//    if(save_in==0){
+//        save_in = dup(STDIN_FILENO);
+//    }
+    write_loginfo_into_file(0, domain, type, addr);
     return 0;
 }
