@@ -318,6 +318,7 @@ write_loginfo_into_file(int fd, const uchar * domain, int type,
     int len = fill_domain_to_len_label(domain, domstr);
     printf(domstr);
     printf("\n");
+    fflush(stdout);
     
 //    int len = 0;
 //    char buffer[600] = { 0 };
